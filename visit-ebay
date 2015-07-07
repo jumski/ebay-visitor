@@ -9,18 +9,14 @@ done
 
 urls_file=${1:-./urls_file}
 proxies_file=${2:-./proxies_file}
-timeout=10
-
-random_proxy() {
-  sort --random-sort "$proxies_file" | head -1
-}
+timeout=30
 
 visit_auction() {
   url="$1"
-  proxy="$(random_proxy)"
+  proxy="$(sort --random-sort "$proxies_file" | head -1)"
 
   echo " => $url @ $proxy"
-  timeout $timeout curl --proxy "$proxy" "$url" --silent 2>&1 >/dev/null
+  timeout $timeout curl --silent --proxy "$proxy" "$url" 2>&1 >/dev/null
 
   if [ "$?" = "0" ]; then
     echo "    [ok] $url @ $proxy"
@@ -29,8 +25,7 @@ visit_auction() {
   fi
 }
 
-
-for url in $(sort --random-sort $urls_file); do
+for url in $(sort --unique $urls_file | sort --random-sort); do
   visit_auction "$url" &
 done
 
