@@ -1,0 +1,26 @@
+#!/bin/bash
+
+urls_file=${1:-./urls_file}
+proxies_file=${2:-./proxies_file}
+
+random_proxy() {
+  sort --random-sort "$proxies_file" | head -1
+}
+
+visit_auction() {
+  url="$1"
+  proxy="$(random_proxy)"
+
+  echo "=> $url @ $proxy"
+  # echo curl --connect-timeout 3 --proxy "$proxy" "$url" --silent
+  curl --connect-timeout 3 --proxy "$proxy" "$url" --silent 2>&1 >/dev/null
+  echo "  - visited"
+}
+
+
+for url in $(sort --random-sort $urls_file); do
+  visit_auction "$url" 
+done
+
+echo
+echo
