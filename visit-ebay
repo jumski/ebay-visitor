@@ -1,7 +1,15 @@
 #!/bin/bash
 
+# DEPENDENCIES:
+# - curl (sudo apt-get install -y curl)
+# - timeout (sudo apt-get install -y timeout)
+for executable in curl timeout; do
+  which $executable 2>&1 >/dev/null || (echo "Cannot find executable '$executable'" && exit 1)
+done
+
 urls_file=${1:-./urls_file}
 proxies_file=${2:-./proxies_file}
+timeout=10
 
 random_proxy() {
   sort --random-sort "$proxies_file" | head -1
@@ -11,21 +19,22 @@ visit_auction() {
   url="$1"
   proxy="$(random_proxy)"
 
-  echo "=> $url @ $proxy"
-  # echo curl --connect-timeout 3 --proxy "$proxy" "$url" --silent
-  curl --connect-timeout 10 --proxy "$proxy" "$url" --silent 2>&1 >/dev/null
+  echo " => $url @ $proxy"
+  timeout $timeout curl --proxy "$proxy" "$url" --silent 2>&1 >/dev/null
 
   if [ "$?" = "0" ]; then
-    echo "  - visited"
+    echo "    [ok] $url @ $proxy"
   else
-    echo "  - failed"
+    echo "    [fail] $url @ $proxy"
   fi
 }
 
 
 for url in $(sort --random-sort $urls_file); do
-  visit_auction "$url" 
+  visit_auction "$url" &
 done
+
+wait
 
 echo
 echo
