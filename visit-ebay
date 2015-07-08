@@ -23,21 +23,25 @@ visit_auction() {
   url="$1"
   proxy="$(sort --random-sort "$proxies_file" | head -1)"
 
-  # echo " => $url via $proxy"
+  echo " => $url via $proxy"
   curl_with_proxy "$url" "$proxy"
 
-  # if [ "$?" = "0" ]; then
-  #   echo "    [ok] $url"
-  # else
-  #   echo "    [fail] $url"
-  # fi
+  if [ "$?" = "0" ]; then
+    echo "    [ok] $url"
+  else
+    echo "    [fail] $url"
+  fi
 }
 
-for url in $(sort --unique --random-sort $urls_file); do
+# sed is used to remove '?somevar=val' form end of url, because i dont know
+# how to pass such a variable to curl without bash expanding the ? glob
+# (i think this is the problem)
+for url in $(sort --unique --random-sort $urls_file | sed 's|\?.*$||g'); do
   visit_auction "$url" &
 done
 
-wait
+echo
+echo Waiting for responses...
+echo
 
-echo
-echo
+wait
