@@ -7,6 +7,10 @@ for executable in curl timeout; do
   which $executable 2>&1 >/dev/null || (echo "Cannot find executable '$executable'" && exit 1)
 done
 
+# kill any running jobs on exit
+cleanup() { kill $(jobs -p); }
+trap cleanup EXIT
+
 urls_file=${1:-./urls_file}
 proxies_file=${2:-./proxies_file}
 timeout=30
