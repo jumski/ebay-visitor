@@ -3,7 +3,7 @@ main: loop
 .PHONY: visit loop install
 
 loop:
-	while true; do make visit; echo; echo; echo Last visited at `date`; echo Sleeping for 5 minutes; echo; sleep 300; done
+	./run-in-loop
 
 visit:  proxies
 	./visit-ebay urls.txt proxies

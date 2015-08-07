@@ -1,0 +1,14 @@
+#!/bin/bash
+while true; do
+ 	make visit || echo "Failed to run visitor"
+ 	echo
+ 	echo
+ 	echo Last visited at `date`
+
+	interval=$(shuf -i 180-600 -n 1)
+
+ 	echo Sleeping for $interval seconds
+ 	echo
+
+ 	sleep $interval
+done
